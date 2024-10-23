@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSSR AI - Cloud Security Schedule Review AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        h1 {
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        .scrollable-checkboxes {
+            max-height: 300px; 
+            overflow-y: auto;  
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">CSSR AI</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Cloud Security Schedule Review AI</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="mb-4">
+                    <label for="saasInput" class="form-label">Enter the SaaS Solution Name:</label>
+                    <input type="text" id="saasInput" class="form-control" placeholder="e.g., Salesforce">
+                </div>
+                
+                <label class="form-label">Please select one or more CSSR Sections:</label>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <div class="scrollable-checkboxes">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Description" id="section1">
+                                <label class="form-check-label" for="section1">Description</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Applicability" id="section2">
+                                <label class="form-check-label" for="section2">Applicability</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Compliance & Certifications" id="section3">
+                                <label class="form-check-label" for="section3">Compliance & Certifications</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Access Control" id="section4">
+                                <label class="form-check-label" for="section4">Access Control</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Authentication" id="section5">
+                                <label class="form-check-label" for="section5">Authentication</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Security Awareness" id="section6">
+                                <label class="form-check-label" for="section6">Security Awareness</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Log Generation and Retention" id="section7">
+                                <label class="form-check-label" for="section7">Log Generation and Retention</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="scrollable-checkboxes">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Investigations Support" id="section8">
+                                <label class="form-check-label" for="section8">Investigations Support</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Development, Configuration and Vulnerability Management" id="section9">
+                                <label class="form-check-label" for="section9">Development, Configuration and Vulnerability Management</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Business Continuity, Disaster Recovery and Backup Plans" id="section10">
+                                <label class="form-check-label" for="section10">Business Continuity, Disaster Recovery and Backup Plans</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Incident Response and Management" id="section11">
+                                <label class="form-check-label" for="section11">Incident Response and Management</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Breach Notifications" id="section12">
+                                <label class="form-check-label" for="section12">Breach Notifications</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="getResponseButton" class="btn btn-primary w-100" onclick="submitForm()">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted"></span>
+        </div>
+    </footer>
+
+    <script>
+        function submitForm() {
+            const saas = document.getElementById('saasInput').value.trim();
+            const selectedSections = Array.from(document.querySelectorAll('.form-check-input:checked')).map(cb => cb.value);
+            if (saas === "") {
+                alert("Please enter a SaaS solution name.");
+                return;
+            }
+            if (selectedSections.length === 0) {
+                alert("Please select at least one section.");
+                return;
+            }
+
+            const queryParams = new URLSearchParams({ saas, sections: selectedSections.join(',') }).toString();
+            window.location.href = `screen.html?${queryParams}`;
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSSR AI - Demo Screen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .result-screen {
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            height: 500px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">CSSR AI</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="text-center">Results for <span id="saasName"></span></h1>
+
+        <div class="d-flex justify-content-center mb-3">
+            <button class="btn btn-light me-2" onclick="goBack()">Back to Main</button>
+            <button class="btn btn-secondary me-2" onclick="exportPDF()">Export PDF</button>
+            <button class="btn btn-secondary me-2" onclick="exportWord()">Export Word</button>
+        </div>
+
+        <div id="result" class="result-screen">
+            <!-- Sección de resultados se llenará aquí -->
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const promptsPorSeccion = {
+            "Description": "Provide a concise description of [the SaaS solution], including its primary purpose, key features, and typical usage scenarios. Limit your response to 1 paragraph.",
+            "Applicability": "Does [the SaaS Solution] apply the terms and conditions of this Schedule to all Services provided by itself, its subcontractors, and their respective personnel?",
+            "Compliance & Certifications": "Does [the SaaS Solution] comply with relevant certifications? Please provide the relevant documentation.",
+            "Access Control": "Does [the SaaS Solution] grant access only to authorized personnel?",
+            "Authentication": "Does [the SaaS Solution] use globally accepted authentication mechanisms?",
+            "Security Awareness": "Describe the security awareness training provided.",
+            "Log Generation and Retention": "Describe the log generation and retention policies.",
+            "Investigations Support": "How does [the SaaS Solution] support investigations?",
+            "Development, Configuration and Vulnerability Management": "Describe the practices in place for development, configuration, and vulnerability management.",
+            "Business Continuity, Disaster Recovery and Backup Plans": "What are the business continuity and disaster recovery plans?",
+            "Incident Response and Management": "Describe the incident response and management process.",
+            "Breach Notifications": "What are the breach notification procedures?"
+        };
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const result = document.getElementById('result').innerText;
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text(result, 10, 10);
+            doc.save('results.pdf');
+        }
+
+        function exportWord() {
+            const result = document.getElementById('result').innerText;
+            const blob = new Blob([result], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'results.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            const saas = params.get('saas');
+            const sections = params.get('sections').split(',');
+
+            document.getElementById('saasName').innerText = saas;
+
+            let resultsHTML = '';
+            sections.forEach(section => {
+                const prompt = promptsPorSeccion[section].replace(/\[the SaaS solution\]/g, saas);
+                resultsHTML += `<p><strong>${section}</strong>: ${prompt}</p>`;
+            });
+
+            document.getElementById('result').innerHTML = resultsHTML;
+        }
+
+        window.onload = init;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
