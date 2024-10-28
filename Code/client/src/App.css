@@ -1,0 +1,144 @@
+.App {
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.navbar {
+  background-color: #333;
+  padding: 10px;
+  text-align: left;
+}
+
+.navbar-brand {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5em;
+}
+
+.search-form {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.section-selection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.section-selection label {
+  display: flex;
+  align-items: center;
+}
+
+.section-selection input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para ResultsPage */
+.results-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.results-header h1 {
+    margin: 0;
+}
+
+.results-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.results-actions button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+}
+
+.results-container {
+    background-color: #f8f9fa;
+    padding: 20px; 
+}
+
+.result-section {
+    margin-bottom: 20px; 
+}
+
+.result-section h2 {
+    color:#007bff; 
+    border-bottom :1 px solid #dee2e6; 
+    padding-bottom :5 px; 
+} 
+
+.result-section p { 
+   margin-top :10 px; 
+}
+
+.result-screen {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  margin-top: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+
+.result-content {
+  text-align: left;
+}
+
+.result-item {
+  margin-bottom: 15px;
+}
+
+.result-item strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #007bff;
+}
+
+.result-item p {
+  margin: 0;
+  padding-left: 15px;
+}
