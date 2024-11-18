@@ -2,7 +2,6 @@
 #                 Base                      #
 #############################################
 # Use an official Node.js runtime as a base image
-#test build
 FROM node:22.9-bullseye-slim as base
 
 # Set the working directory in the container
