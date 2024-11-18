@@ -2,13 +2,6 @@
 name: API - TEST Deploy
 
 on:
-  pull_request:
-    types:
-      - closed
-    branches: [main]
-    paths:
-      - 'server/**' # Triggers on changes to files in the server/ directory.
-
   workflow_dispatch:
       inputs:
         image_tag:
@@ -16,7 +9,8 @@ on:
           required: true
 
 env:
-  IMAGE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.image_tag || github.event.pull_request.number }}
+  IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+  ENVIRONMENT: 'test'
 
 jobs:
   # Job to deploy API image to OpenShift
