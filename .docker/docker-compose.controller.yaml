@@ -1,0 +1,44 @@
+services:
+  ############################# Express API ###################################
+  cssr-api:
+    restart: 'no'
+    build:
+      context: ../server
+      target: Prod
+    ports:
+      - ${API_HTTP_PORT:-8000}:8000
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/api/health']
+      interval: 300s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cssr
+  ########################## End Express API ##################################
+
+  ############################## React App ####################################
+  cssr-app:
+    tty: true
+    restart: 'no'
+    build:
+      context: ../client
+      target: prod
+    ports:
+      - ${APP_HTTP_PORT:-3000}:3000
+    depends_on:
+      - cssr-api
+    networks:
+      - cssr
+  ############################ End React App ##################################
+
+  ######################## Networks Definition ################################
+networks:
+    cssr:
+      name: cssr-net
+      driver: bridge
+  ##################### End Networks Definition ###############################
+
+  ######################### Volumes Definition ################################
+  # volumes:
+
+  ##################### End Volumes Definition ################################
