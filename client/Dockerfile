@@ -1,7 +1,7 @@
 #############################################
 #                Base Build                 #
 #############################################
-# test build
+
 FROM node:18.17.1-bullseye-slim as base
 
 # Set the working directory to /app
