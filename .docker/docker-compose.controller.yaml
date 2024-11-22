@@ -1,6 +1,8 @@
 services:
   ############################# Express API ###################################
   cssr-api:
+    env_file:
+      - ../server/.env
     restart: 'no'
     build:
       context: ../server
