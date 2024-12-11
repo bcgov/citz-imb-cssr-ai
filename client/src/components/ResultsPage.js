@@ -1,156 +1,197 @@
-
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { categoryLabels } from '../utils/categoryLabels';  // Ensure this variable is correctly set.
 import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
-import { saveAs } from 'file-saver';
-import { categoryLabels } from '../utils/categoryLabels';
+import { Packer, Document, Paragraph, TextRun } from "docx"; // Import docx
+import PizZip from 'pizzip';
+import Docxtemplater from 'docxtemplater';
+import { saveAs } from 'file-saver';  // Import saveAs from file-saver
 
 function ResultsPage() {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const { query, results } = location.state || {}; 
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { query, results, sources } = location.state || {};
 
-    const handleExport = (format) => {
-        if (format === 'PDF') {
-            exportToPDF();
-        } else if (format === 'Word') {
-            exportToWord();
+  // Recursive function to render nested values, if any
+  const renderValue = (value) => {
+    if (typeof value === 'object' && value !== null) {
+      return (
+        <ul>
+          {Object.entries(value).map(([subKey, subValue]) => (
+            <li key={subKey}>
+              <strong>{subKey}:</strong> {renderValue(subValue)}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    // Detect if the value is a URL and render it as a clickable link
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const matches = value.match(urlRegex);
+    if (matches) {
+      return value.split(urlRegex).map((part, index) => {
+        // If the part is a URL, render it as a link
+        if (matches.includes(part)) {
+          return (
+            <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="source-link">
+              {part}
+            </a>
+          );
         }
-    };
+        return part; // Otherwise, render the text normally
+      });
+    }
 
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.setFontSize(20);
-        doc.text(`Results for: ${query}`, 10, 10);
-        doc.setFontSize(12);
-    
-        let yPosition = 20; 
-    
-        if (results && results.length > 0) {
-            const resultItem = results[0];
-            Object.entries(resultItem).forEach(([key, value]) => {
-                const label = categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1);
-                doc.text(`${label}:`, 10, yPosition);
-                yPosition += 10;
-    
-                if (typeof value === 'object' && value !== null) {
-                    Object.entries(value).forEach(([subKey, subValue]) => {
-                        doc.text(`- ${subKey}: ${subValue}`, 20, yPosition);
-                        yPosition += 10; 
-                    });
-                } else {
-                   
-                    const textLines = doc.splitTextToSize(value.toString(), 180); 
-                    textLines.forEach(line => {
-                        doc.text(line, 20, yPosition);
-                        yPosition += 10; 
-                    });
-                }
-            });
-        } else {
-            doc.text('No results found', 10, yPosition);
-        }
-    
-        doc.save('results.pdf');
-    };
-    
-    const exportToWord = () => {
-        const doc = new Document({
-            sections: [{
-                properties: {},
-                children: [
-                    new Paragraph({
-                        text: `Results for: ${query}`,
-                        heading: HeadingLevel.HEADING_1,
-                    }),
-                ],
-            }],
-        });
+    return <p>{value}</p>;
+  };
 
-        if (results && results.length > 0) {
-            const resultItem = results[0];
-            Object.entries(resultItem).forEach(([key, value]) => {
-                const label = categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1);
+  // Render the results section, showing information or a message if no results found
+  const renderResults = () => {
+    if (!results || results.length === 0) {
+      return <p>No results found</p>;
+    }
 
-                
-                doc.addSection({
-                    children: [
-                        new Paragraph({
-                            text: `${label}:`,
-                            heading: HeadingLevel.HEADING_2,
-                        }),
-                        ...(typeof value === 'object' && value !== null
-                            ? Object.entries(value).map(([subKey, subValue]) => 
-                                new Paragraph(`${subKey}: ${subValue}`)
-                              )
-                            : [new Paragraph(value !== undefined ? value.toString() : 'No information available')]
-                        ),
-                    ],
-                });
-            });
-        } else {
-            doc.addSection({
-                children: [
-                    new Paragraph('No results found'),
-                ],
-            });
-        }
-
-        Packer.toBlob(doc).then((blob) => {
-            saveAs(blob, 'results.docx');
-        }).catch(error => {
-            console.error('Error exporting to Word:', error); 
-        });
-    };
-
-    const renderValue = (value) => {
-        if (typeof value === 'object' && value !== null) {
-            return (
-                <ul>
-                    {Object.entries(value).map(([subKey, subValue]) => (
-                        <li key={subKey}>{subKey}: {subValue}</li>
-                    ))}
-                </ul>
-            );
-        }
-        return <p>{value}</p>;
-    };
-
-    const renderResults = () => {
-        if (!results || results.length === 0) {
-            return <p>No results found</p>;
-        }
-
-        const resultItem = results[0];
-
-        return (
-            <div>
-                <h2>SaaS Solution: {query}</h2>
-                {Object.entries(resultItem).map(([key, value]) => (
-                    <div key={key} className="result-item">
-                        <strong>{categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
-                        {renderValue(value)}
-                    </div>
-                ))}
-                
-            </div>
-        );
-    };
+    const resultItem = results[0];
 
     return (
-        <div className="results-page">
-            <h1 className="text-center">Results for: {query}</h1>
-            <div className="d-flex justify-content-center mb-3">
-                <button className="btn btn-light me-2" onClick={() => navigate('/')}>Back to Main</button>
-                <button className="btn btn-secondary me-2" onClick={() => handleExport('PDF')}>Export PDF</button>
-                <button className="btn btn-secondary me-2" onClick={() => handleExport('Word')}>Export Word</button>
-            </div>
-            <div className="result-content">
-                {renderResults()}
-            </div>
-        </div>
+      <div>
+        <h2>SaaS Solution: {query}</h2>
+        
+        {/* Loop through each category and render the corresponding data */}
+        {Object.entries(resultItem).map(([key, value]) => (
+          <div key={key} className="result-item">
+            <strong>{categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
+            {renderValue(value)}
+          </div>
+        ))}
+        
+        {/* Display sources as clickable links */}
+        {sources && sources.length > 0 && (
+          <div>
+            <h3>Sources:</h3>
+            {sources.map((source, index) => (
+              <div key={index}>
+                <a
+                  href={source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="source-link"
+                >
+                  {source}
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     );
+  };
+
+  // Function to generate PDF
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(12);
+    doc.text(`SaaS Solution: ${query}`, 10, 10);
+
+    // Add results to the PDF
+    let yPosition = 20;
+    if (results && results.length > 0) {
+      const resultItem = results[0];
+      Object.entries(resultItem).forEach(([key, value], index) => {
+        doc.text(`${categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)}: ${JSON.stringify(value)}`, 10, yPosition);
+        yPosition += 10;
+      });
+    }
+
+    // Add sources
+    if (sources && sources.length > 0) {
+      doc.text("Sources:", 10, yPosition);
+      yPosition += 10;
+      sources.forEach((source, index) => {
+        doc.text(source, 10, yPosition);
+        yPosition += 10;
+      });
+    }
+
+    doc.save('result.pdf');
+  };
+
+  // Function to generate Word document
+  const generateWord = () => {
+    const doc = new Document();
+
+    // Add title to the Word document
+    doc.addSection({
+      children: [
+        new Paragraph({
+          children: [
+            new TextRun("SaaS Solution: " + query).bold(),
+          ],
+        }),
+      ],
+    });
+
+    // Loop through results and add them to the Word document
+    if (results && results.length > 0) {
+      const resultItem = results[0];
+      Object.entries(resultItem).forEach(([key, value]) => {
+        doc.addSection({
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun(`${categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)}: ${JSON.stringify(value)}`),
+              ],
+            }),
+          ],
+        });
+      });
+    }
+
+    // Add sources to the Word document
+    if (sources && sources.length > 0) {
+      doc.addSection({
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun("Sources:").bold(),
+            ],
+          }),
+        ],
+      });
+
+      sources.forEach((source) => {
+        doc.addSection({
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun(source),
+              ],
+            }),
+          ],
+        });
+      });
+    }
+
+    // Generate Word file and save it
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, "result.docx");
+    });
+  };
+
+  return (
+    <div className="results-page">
+      <h1>Results for: {query}</h1>
+      <div className="d-flex justify-content-center mb-3">
+        <button className="btn btn-light me-2" onClick={() => navigate('/')}>Back to Home</button>
+        
+        {/* Buttons for generating PDF and Word */}
+        <button className="btn btn-primary me-2" onClick={generatePDF}>Download PDF</button>
+        <button className="btn btn-success" onClick={generateWord}>Download Word</button>
+      </div>
+      <div>{renderResults()}</div>
+    </div>
+  );
 }
 
 export default ResultsPage;
