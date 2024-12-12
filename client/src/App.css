@@ -197,6 +197,7 @@ button:active {
   transform: translateY(0);
 }
 
+
 /* Container for the results section */
 .results-container {
   background-color: #f8f9fa;
@@ -260,15 +261,15 @@ a:hover {
 /* Container for the loading bar below the form */
 .loading-bar-container {
   width: 60%;           /* Set the width of the loading bar */
-  max-width: 600px;     /* Maximum width for the loading bar */
-  background-color: #f3f3f3; /* Light background color */
-  border-radius: 10px;  /* Rounded corners */
-  margin-top: 20px;     /* Space above the loading bar */
-  margin-left: auto;    /* Center the loading bar horizontally */
-  margin-right: auto;   /* Center the loading bar horizontally */
-  height: 10px;         /* Set the height of the loading bar */
-  padding: 0 15px;      /* Horizontal padding */
-  position: relative;   /* Allows for positioning within the container */
+  max-width: 600px;    
+  background-color: #f3f3f3; 
+  border-radius: 10px;  
+  margin-top: 20px;     
+  margin-left: auto;    
+  margin-right: auto;  
+  height: 10px;        
+  padding: 0 15px;    
+  position: relative;   
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow around the bar */
 }
 

@@ -144,6 +144,7 @@ function ResultsPage() {
       <div className="d-flex justify-content-center mb-3">
         <button className="btn btn-light me-2" onClick={() => navigate('/')}>Back to Home</button>
         <button className="btn btn-primary me-2" onClick={() => generatePDF(results[0])}>Download PDF</button>
+
       </div>
       <div>{renderResults()}</div>
     </div>
