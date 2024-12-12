@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { categoryLabels } from '../utils/categoryLabels'; 
-
 function SearchForm() {
     const [query, setQuery] = useState('');
     const [categories, setCategories] = useState({
@@ -42,6 +41,7 @@ function SearchForm() {
         e.preventDefault();
 
         try {
+        
             const response = await fetch('/api/search', {
                 method: 'POST',
                 headers: {
@@ -55,9 +55,6 @@ function SearchForm() {
             }
 
             const data = await response.json();
-            
-            console.log("Data received from server:", data);
-
             if (data && data.results) {
                 navigate('/results', { state: { query, results: data.results } });
             } else {
@@ -91,7 +88,7 @@ function SearchForm() {
                                 checked={categories[category]} 
                                 onChange={handleCategoryChange} 
                             />
-                            {categoryLabels[category]}
+                            {categoryLabels[category] || category} 
                         </label>
                     ))}
                 </div>
