@@ -3,6 +3,19 @@
 
  The Cloud Security Schedule Review AI (CSSR AI) application is designed to automate the search and collection of cloud security information for SaaS solutions. The system aims to streamline the process of gathering and presenting relevant security data, enabling security analysts to efficiently review and follow up relevant certification and compliance information. 
 
+## Tech Stack
+
+Tech Stack
+ 
+Backend: Node.js, Express.js
+Frontend: React, React Router
+API: OpenAI GPT-4
+PDF Generation: jsPDF
+Word Document Generation: docx
+File Saving: file-saver
+Styling: CSS
+ 
+
 ## Features
 
 ## Usage
