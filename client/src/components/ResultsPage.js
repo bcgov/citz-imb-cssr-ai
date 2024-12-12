@@ -1,18 +1,13 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { categoryLabels } from '../utils/categoryLabels';  // Ensure this variable is correctly set.
-import jsPDF from 'jspdf';
-import { Packer, Document, Paragraph, TextRun } from "docx"; // Import docx
-import PizZip from 'pizzip';
-import Docxtemplater from 'docxtemplater';
-import { saveAs } from 'file-saver';  // Import saveAs from file-saver
+import jsPDF from 'jspdf'; 
 
 function ResultsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { query, results, sources } = location.state || {};
 
-  // Recursive function to render nested values, if any
+  // Function to render values, separating the description from the sources
   const renderValue = (value) => {
     if (typeof value === 'object' && value !== null) {
       return (
@@ -31,7 +26,6 @@ function ResultsPage() {
     const matches = value.match(urlRegex);
     if (matches) {
       return value.split(urlRegex).map((part, index) => {
-        // If the part is a URL, render it as a link
         if (matches.includes(part)) {
           return (
             <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="source-link">
@@ -39,14 +33,14 @@ function ResultsPage() {
             </a>
           );
         }
-        return part; // Otherwise, render the text normally
+        return part;
       });
     }
 
     return <p>{value}</p>;
   };
 
-  // Render the results section, showing information or a message if no results found
+  // Function to display the results
   const renderResults = () => {
     if (!results || results.length === 0) {
       return <p>No results found</p>;
@@ -57,30 +51,20 @@ function ResultsPage() {
     return (
       <div>
         <h2>SaaS Solution: {query}</h2>
-        
-        {/* Loop through each category and render the corresponding data */}
         {Object.entries(resultItem).map(([key, value]) => (
           <div key={key} className="result-item">
-            <strong>{categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
+            <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
             {renderValue(value)}
           </div>
         ))}
-        
-        {/* Display sources as clickable links */}
+
         {sources && sources.length > 0 && (
           <div>
             <h3>Sources:</h3>
             {sources.map((source, index) => (
-              <div key={index}>
-                <a
-                  href={source}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="source-link"
-                >
-                  {source}
-                </a>
-              </div>
+              <p key={index} className="source-link">
+                - <a href={source} target="_blank" rel="noopener noreferrer">{source}</a>
+              </p>
             ))}
           </div>
         )}
@@ -88,95 +72,70 @@ function ResultsPage() {
     );
   };
 
-  // Function to generate PDF
-  const generatePDF = () => {
+  // Function to generate the PDF with the structure of renderResults
+  const generatePDF = (data) => {
     const doc = new jsPDF();
-    doc.setFontSize(12);
-    doc.text(`SaaS Solution: ${query}`, 10, 10);
 
-    // Add results to the PDF
-    let yPosition = 20;
-    if (results && results.length > 0) {
-      const resultItem = results[0];
-      Object.entries(resultItem).forEach(([key, value], index) => {
-        doc.text(`${categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)}: ${JSON.stringify(value)}`, 10, yPosition);
-        yPosition += 10;
-      });
-    }
+    // Document title (with color and bold style)
+    doc.setFontSize(20);
+    doc.setTextColor(0, 102, 204);  // Blue for the title
+    doc.setFont('helvetica', 'bold');
+    doc.text("SaaS Solution: " + query, 20, 20);  // Title in bold and blue
 
-    // Add sources
+    let yPos = 30;  // Initial position on the Y-axis
+
+    // Iterate through the data and add the categories to the PDF
+    Object.entries(data).forEach(([key, value]) => {
+      if (value) {
+        doc.setFont('helvetica', 'bold');  // Bold for category titles
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0); 
+        doc.text(key.charAt(0).toUpperCase() + key.slice(1) + ":", 20, yPos);  // Category title
+        yPos += 10;  // Space after category title
+
+        doc.setFont('helvetica', 'normal');  // Normal for category content
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0); 
+        // Use maxWidth to prevent the text from going out of bounds
+        const text = value.Information || value;
+        doc.text(text, 20, yPos, { maxWidth: 170 });  // Category value
+        yPos += (text.length / 30) * 1.1;  // Adjust height based on text length
+
+        // If there are links in the value, make them clickable
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const matches = text.match(urlRegex);
+        if (matches) {
+          matches.forEach((url) => {
+            doc.setTextColor(0, 0, 255);  // Blue for links
+            doc.textWithLink(url, 20, yPos, { url: url });
+            yPos += 10;  // Space after link
+          });
+        }
+
+        // Add a small space between categories to avoid overlap
+        yPos += 10;
+      }
+    });
+
+    // Sources section
     if (sources && sources.length > 0) {
-      doc.text("Sources:", 10, yPosition);
-      yPosition += 10;
+      doc.setFont('helvetica', 'bold');  // Bold for the "Sources" title
+      doc.setFontSize(12);
+      doc.text("Sources:", 20, yPos);  // Sources category title
+      yPos += 10;  // Space after "Sources" title
+
+      // Links in blue
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 0, 255);  // Blue for links
       sources.forEach((source, index) => {
-        doc.text(source, 10, yPosition);
-        yPosition += 10;
+        const linkYPos = yPos + (index * 10);
+        doc.textWithLink(source, 20, linkYPos, { url: source });
       });
+      yPos += 20;  // Space after links
     }
 
-    doc.save('result.pdf');
-  };
-
-  // Function to generate Word document
-  const generateWord = () => {
-    const doc = new Document();
-
-    // Add title to the Word document
-    doc.addSection({
-      children: [
-        new Paragraph({
-          children: [
-            new TextRun("SaaS Solution: " + query).bold(),
-          ],
-        }),
-      ],
-    });
-
-    // Loop through results and add them to the Word document
-    if (results && results.length > 0) {
-      const resultItem = results[0];
-      Object.entries(resultItem).forEach(([key, value]) => {
-        doc.addSection({
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun(`${categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)}: ${JSON.stringify(value)}`),
-              ],
-            }),
-          ],
-        });
-      });
-    }
-
-    // Add sources to the Word document
-    if (sources && sources.length > 0) {
-      doc.addSection({
-        children: [
-          new Paragraph({
-            children: [
-              new TextRun("Sources:").bold(),
-            ],
-          }),
-        ],
-      });
-
-      sources.forEach((source) => {
-        doc.addSection({
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun(source),
-              ],
-            }),
-          ],
-        });
-      });
-    }
-
-    // Generate Word file and save it
-    Packer.toBlob(doc).then((blob) => {
-      saveAs(blob, "result.docx");
-    });
+    // Save the PDF
+    doc.save(query + "_report.pdf");
   };
 
   return (
@@ -184,10 +143,8 @@ function ResultsPage() {
       <h1>Results for: {query}</h1>
       <div className="d-flex justify-content-center mb-3">
         <button className="btn btn-light me-2" onClick={() => navigate('/')}>Back to Home</button>
-        
-        {/* Buttons for generating PDF and Word */}
-        <button className="btn btn-primary me-2" onClick={generatePDF}>Download PDF</button>
-        <button className="btn btn-success" onClick={generateWord}>Download Word</button>
+        <button className="btn btn-primary me-2" onClick={() => generatePDF(results[0])}>Download PDF</button>
+
       </div>
       <div>{renderResults()}</div>
     </div>
