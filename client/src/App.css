@@ -1,14 +1,16 @@
-/* src/App.css */
+/* Basic font family for the app */
 .App {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
+/* Header style for the search page */
 .search-page h1 {
   margin-top: 40px;
   margin-bottom: 25px;
-  text-align: center; 
+  text-align: center;
 }
 
+/* Container for the results page */
 .results-page {
   max-width: 800px;
   margin: 20px auto;
@@ -16,7 +18,7 @@
   align-items: center;
 }
 
-
+/* Header layout for the results section */
 .results-header {
   display: flex;
   justify-content: space-between;
@@ -24,28 +26,33 @@
   margin-bottom: 20px;
 }
 
+/* Style for the main title in the results header */
 .results-header h1 {
   align-items: center;
   margin: 0;
 }
 
+/* Layout for buttons or actions in the results page */
 .results-actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+/* Styling for buttons in the results actions */
 .results-actions button {
   padding: 10px 15px;
   background-color: #007bff;
   color: white;
 }
 
+/* Styling for each result item */
 .result-item {
   margin-bottom: 15px;
   align-items: left;
 }
 
+/* Style for the strong text inside result items */
 .result-item strong {
   display: block;
   margin-bottom: 5px;
@@ -53,56 +60,66 @@
   font-weight: bold;
 }
 
+/* Style for paragraphs inside result items */
 .result-item p {
   margin: 0;
   padding-left: 15px;
 }
 
+/* Styling for source links */
 .source-link {
   color: rgb(0, 166, 255); 
   text-decoration: none; 
   cursor: pointer; 
 }
 
+/* Hover effect for source links */
 .source-link:hover {
   text-decoration: underline; 
   color: #0056b3;
 }
 
+/* Styling for the navigation bar */
 .navbar {
-  background-color: #019cc7;
+  background-color: #1d70c3;
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+/* Layout for the left side of the navigation bar */
 .navbar-left {
   display: flex;
   align-items: center;
 }
 
+/* Styling for the navbar logo */
 .navbar-logo {
   height: 35px;
   margin-right: 7px;
 }
 
+/* Styling for the brand name in the navbar */
 .navbar-brand {
   color: white;
   text-decoration: none;
   font-size: 1.5em;
 }
 
+/* Layout for the right side of the navigation bar */
 .navbar-right {
   display: flex;
   align-items: center;
 }
 
+/* Styling for the team name in the navbar */
 .navbar-team {
   color: white;
   font-style: italic;
 }
 
+/* Styling for the search form */
 .search-form {
   max-width: 600px;
   margin: 20px auto;
@@ -111,17 +128,20 @@
   border: 1px solid #ddd;
 }
 
+/* Layout for form groups */
 .form-group {
   margin-bottom: 15px;
   text-align: left;
 }
 
+/* Styling for labels in the form */
 .form-group label {
   display: block;
   margin-bottom: 5px;
   font-size: 14px;
 }
 
+/* Styling for text inputs */
 input[type="text"] {
   width: 97%;
   margin: 7px 0px;
@@ -130,6 +150,7 @@ input[type="text"] {
   border-radius: 4px;
 }
 
+/* Layout for section selection (checkboxes) */
 .section-selection {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -137,15 +158,18 @@ input[type="text"] {
   gap: 10px;
 }
 
+/* Styling for each checkbox label */
 .section-selection label {
   display: flex;
   align-items: center;
 }
 
+/* Styling for checkboxes */
 .section-selection input[type="checkbox"] {
   margin-right: 6px;
 }
 
+/* General button styling */
 button {
   padding: 12px 24px;
   margin-right: 12px;
@@ -159,37 +183,44 @@ button {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Hover effect for buttons */
 button:hover {
   background-color: #003d82;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
+/* Active button styling */
 button:active {
   background-color: #004c9e;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   transform: translateY(0);
 }
 
+/* Container for the results section */
 .results-container {
   background-color: #f8f9fa;
   padding: 20px;
 }
 
+/* Section layout for results */
 .result-section {
   margin-bottom: 20px;
 }
 
+/* Header styling for result sections */
 .result-section h2 {
   color: #007bff;
   border-bottom: 1px solid #dee2e6;
   padding-bottom: 5px;
 }
 
+/* Styling for paragraphs in result sections */
 .result-section p {
   margin-top: 10px;
 }
 
+/* Container for the result screen */
 .result-screen {
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -200,6 +231,55 @@ button:active {
   background-color: #f8f9fa;
 }
 
+/* Left-aligned content inside the result screen */
 .result-content {
   text-align: left;
+}
+
+/* Container for the sources section */
+.sources-container {
+  margin-top: 20px;
+}
+
+/* Styling for unordered lists */
+ul {
+  padding-left: 20px;
+}
+
+/* General styling for links */
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+/* Hover effect for links */
+a:hover {
+  text-decoration: underline;
+}
+
+/* Container for the loading bar below the form */
+.loading-bar-container {
+  width: 60%;           /* Set the width of the loading bar */
+  max-width: 600px;     /* Maximum width for the loading bar */
+  background-color: #f3f3f3; /* Light background color */
+  border-radius: 10px;  /* Rounded corners */
+  margin-top: 20px;     /* Space above the loading bar */
+  margin-left: auto;    /* Center the loading bar horizontally */
+  margin-right: auto;   /* Center the loading bar horizontally */
+  height: 10px;         /* Set the height of the loading bar */
+  padding: 0 15px;      /* Horizontal padding */
+  position: relative;   /* Allows for positioning within the container */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow around the bar */
+}
+
+/* Style for the progress bar */
+.loading-bar {
+  height: 90%;            /* Fill the height of the container */
+  background-color: #4caf50; 
+  border-radius: 10px;     
+  text-align: center;      
+  line-height: 10px;        
+  color: white;           
+  font-weight: bold;        
+  transition: width 0.3s ease-in-out; /* Smooth transition when width changes */
 }
