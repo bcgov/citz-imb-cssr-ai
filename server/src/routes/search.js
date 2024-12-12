@@ -48,7 +48,7 @@ router.post('/', async (req, res) => {
     try {
         const prompt = generatePrompt(query, categories);
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
+            model: "gpt-4",
             messages: [{ role: "user", content: prompt }],
             max_tokens: 1500,
             temperature: 0.3
