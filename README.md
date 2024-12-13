@@ -20,6 +20,15 @@ Styling: CSS
 
 ## Usage
 
+## Functionalities
+1.	Category-based Querying: Users can select specific CSSR sections for their queries.
+2.	Structured Responses: The API returns responses in a structured JSON format.
+3.	Source Extraction: The application extracts and displays sources from the API responses.
+4.	PDF Generation: Users can generate a PDF report of the search results.
+5.	Word Document Generation: Users can generate a Word document report of the search results.
+6.	Navigation: Users can navigate between the search and results pages.
+
+
 ## Requirements
 
 ## Installation

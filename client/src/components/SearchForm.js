@@ -53,13 +53,13 @@ function SearchForm() {
             // Simulate progress while waiting for the server response
             const interval = setInterval(() => {
                 setProgress((prev) => {
-                    if (prev >= 90) {
-                        clearInterval(interval);  // Stop progress once 90% is reached
-                        return 100;
+                    if (prev >= 100) {
+                        // Let the bar continue to 100% without stopping it
+                        return prev;
                     }
-                    return prev + 6;  // Increment progress by 6%
+                    return prev + 5;  // Increment progress by 5% every 1650ms
                 });
-            }, 1600); // Update every 1600ms
+            }, 1650); // Update every 1650ms
 
             // Send the search query and categories to the backend API
             const response = await fetch('/api/search', {
