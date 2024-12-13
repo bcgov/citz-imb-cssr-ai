@@ -59,7 +59,8 @@ function SearchForm() {
                     }
                     return prev + 5;  // Increment progress by 5% every 1650ms
                 });
-            }, 2000); // Update every 1650ms
+
+            }, 2000); // Update every 2000ms
 
             // Send the search query and categories to the backend API
             const response = await fetch('/api/search', {
