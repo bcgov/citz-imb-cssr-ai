@@ -2,7 +2,7 @@
 #                 Base                      #
 #############################################
 # Use an official Node.js runtime as a base image
-FROM node:22.9-bullseye-slim as base
+FROM node:22.9-bullseye-slim AS base
 
 # Set the working directory in the container
 WORKDIR /server
@@ -19,7 +19,7 @@ RUN npm run build
 #############################################
 #                 Prod Build                #
 #############################################
-FROM node:22.9-bullseye-slim as Prod
+FROM node:22.9-bullseye-slim AS prod
 
 # Set the working directory to /server
 WORKDIR /server

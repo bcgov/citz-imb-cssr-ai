@@ -2,7 +2,7 @@
 #                Base Build                 #
 #############################################
 
-FROM node:18.17.1-bullseye-slim as base
+FROM node:18.17.1-bullseye-slim AS base
 
 # Set the working directory to /app
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN npm run build
 #                NGINX Build                #
 #############################################
 ## Stage 2: Nginx state for serving content
-FROM nginx:alpine-slim as prod
+FROM nginx:alpine-slim AS prod
 
 # copy custom nginx configuration from host to container
 COPY nginx.conf /etc/nginx/conf.d/default.conf
