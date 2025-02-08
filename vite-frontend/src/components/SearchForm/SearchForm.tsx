@@ -1,6 +1,10 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Categories, SearchResponse, categoryLabels } from "@/components/SearchForm/types";
+import {
+	Categories,
+	SearchResponse,
+	categoryLabels,
+} from "@/components/SearchForm/types";
 import "@/components/SearchForm/SearchForm.css";
 
 export const SearchForm: React.FC = () => {
@@ -132,7 +136,7 @@ export const SearchForm: React.FC = () => {
 
 				{error && <div className="error-message">{error}</div>}
 
-				<button type="submit" disabled={loading}>
+				<button type="submit" disabled={loading} className="btn btn-primary">
 					{loading ? "Searching..." : "Search"}
 				</button>
 			</form>

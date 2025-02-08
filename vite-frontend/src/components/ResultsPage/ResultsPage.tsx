@@ -2,7 +2,11 @@ import React, { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { LocationState, TextOptions, LinkOptions } from "@/components/ResultsPage/types";
+import {
+	LocationState,
+	TextOptions,
+	LinkOptions,
+} from "@/components/ResultsPage/types";
 import "@/components/ResultsPage/ResultsPage.css";
 
 export const ResultsPage: React.FC = () => {

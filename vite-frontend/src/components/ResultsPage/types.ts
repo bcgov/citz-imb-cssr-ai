@@ -1,13 +1,13 @@
 export interface LocationState {
-    query: string;
-    results: Record<string, unknown>[];
-    sources: string[];
+	query: string;
+	results: Record<string, unknown>[];
+	sources: string[];
 }
 
 export interface TextOptions {
-    maxWidth?: number;
+	maxWidth?: number;
 }
 
 export interface LinkOptions {
-    url: string;
-} 
+	url: string;
+}

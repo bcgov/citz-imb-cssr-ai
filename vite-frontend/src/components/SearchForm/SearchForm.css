@@ -28,3 +28,12 @@
 .section-selection input[type="checkbox"] {
 	margin-right: 6px;
 }
+
+/* Styling for text inputs */
+input[type="text"] {
+	width: 97%;
+	margin: 7px 0px;
+	padding: 8px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}

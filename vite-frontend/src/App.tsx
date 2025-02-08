@@ -7,11 +7,11 @@ import ResultsPage from "@/components/ResultsPage/ResultsPage";
 const App: React.FC = () => {
 	return (
 		<Router>
-				<Navbar />
-				<Routes>
-					<Route path="/" element={<SearchPage />} />
-					<Route path="/results" element={<ResultsPage />} />
-				</Routes>
+			<Navbar />
+			<Routes>
+				<Route path="/" element={<SearchPage />} />
+				<Route path="/results" element={<ResultsPage />} />
+			</Routes>
 		</Router>
 	);
 };
