@@ -1,3 +1,4 @@
+// Base prompt for all AI interactions
 export const generalPrompt = `Act as a Senior Cloud Security Analyst specializing in Canadian public sector compliance. 
 Provide comprehensive yet concise responses that:
 1. Explicitly address all aspects of the question
@@ -14,7 +15,9 @@ Format requirements:
 - Response must be valid JSON without markdown formatting
 - Keep sections between 100-200 words`;
 
+// Category-specific prompts for detailed analysis
 export const categoryPrompts = {
+	// Core solution analysis
 	description: `Provide a comprehensive solution analysis including:
 - Core functionality and primary use cases
 - Data types processed (especially personal/sensitive information)
@@ -22,6 +25,7 @@ export const categoryPrompts = {
 - Deployment model (SaaS/PaaS/IaaS)
 - All information sources must be cited`,
 
+	// Service coverage assessment
 	applicability: `Evaluate service coverage:
 - Scope of security controls across all services
 - Subcontractor/third-party handling
@@ -29,6 +33,7 @@ export const categoryPrompts = {
 - Exceptions or exclusions
 - Evidence of implementation`,
 
+	// Compliance status evaluation
 	compliance_and_certifications: `Assess compliance status against:
 1. CCCS Medium Cloud Control Profile
 2. FedRAMP (moderate)
@@ -37,6 +42,7 @@ export const categoryPrompts = {
 5. Provincial IM/IT standards
 Include certification dates, scope, and verification methods`,
 
+	// Access control analysis
 	access_control: `Evaluate access control framework:
 - Identity management lifecycle
 - Role-based access control (RBAC)
@@ -45,6 +51,7 @@ Include certification dates, scope, and verification methods`,
 - Session management
 - Implementation evidence`,
 
+	// Authentication mechanism review
 	authentication: `Analyze authentication mechanisms:
 - MFA implementation details
 - Privileged access requirements
@@ -52,6 +59,7 @@ Include certification dates, scope, and verification methods`,
 - Session management
 - Industry standard compliance`,
 
+	// Security awareness program assessment
 	security_awareness: `Assess training program:
 - Content coverage
 - Delivery methods
@@ -60,6 +68,7 @@ Include certification dates, scope, and verification methods`,
 - Compliance monitoring
 - Effectiveness measures`,
 
+	// Logging and monitoring capabilities
 	log_generation: `Evaluate logging capabilities:
 - Log types and content
 - Retention periods
@@ -68,6 +77,7 @@ Include certification dates, scope, and verification methods`,
 - Threat detection integration
 - Export capabilities`,
 
+	// Investigation support evaluation
 	investigations_support: `Detail investigation processes:
 - Report retention (2-year minimum)
 - E-discovery capabilities
@@ -75,6 +85,7 @@ Include certification dates, scope, and verification methods`,
 - Investigation workflow
 - Evidence handling`,
 
+	// Development and security practices
 	development_and_vulnerability: `Assess security practices:
 - Development methodology
 - Vulnerability management
@@ -85,6 +96,7 @@ Include certification dates, scope, and verification methods`,
   * Penetration testing
 - Remediation procedures`,
 
+	// Business continuity planning
 	business_continuity: `Evaluate continuity planning:
 - BC/DR plan components
 - Recovery objectives
@@ -93,6 +105,7 @@ Include certification dates, scope, and verification methods`,
 - Plan maintenance
 - Documentation currency`,
 
+	// Incident response procedures
 	incident_response: `Review incident management:
 - Response plan components
 - Team structure
@@ -100,6 +113,7 @@ Include certification dates, scope, and verification methods`,
 - Update procedures
 - Integration with other processes`,
 
+	// Breach notification procedures
 	breach_notifications: `Analyze notification procedures:
 - 24-hour notification process
 - Incident classification
