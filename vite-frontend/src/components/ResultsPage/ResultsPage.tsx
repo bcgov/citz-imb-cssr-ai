@@ -2,11 +2,7 @@ import React, { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import {
-	LocationState,
-	TextOptions,
-	LinkOptions,
-} from "@/components/ResultsPage/types";
+import { LocationState, LinkOptions } from "@/components/ResultsPage/types";
 import "@/components/ResultsPage/ResultsPage.css";
 
 export const ResultsPage: React.FC = () => {
@@ -91,60 +87,95 @@ export const ResultsPage: React.FC = () => {
 
 	const generatePDF = (data: Record<string, unknown>): void => {
 		const doc = new jsPDF();
+		const pageWidth = doc.internal.pageSize.width;
+		const margin = 20;
+		const contentWidth = pageWidth - 2 * margin;
 
+		// Helper function to add new page if needed
+		const checkAndAddPage = (
+			currentY: number,
+			requiredSpace: number
+		): number => {
+			if (currentY + requiredSpace > doc.internal.pageSize.height - margin) {
+				doc.addPage();
+				return margin + 10; // Reset Y position on new page
+			}
+			return currentY;
+		};
+
+		// Title
 		doc.setFontSize(20);
 		doc.setTextColor(0, 102, 204);
 		doc.setFont("helvetica", "bold");
-		doc.text("SaaS Solution: " + query, 20, 20);
+		let yPos = 20;
+		doc.text("SaaS Solution: " + query, margin, yPos);
 
-		let yPos = 30;
+		yPos += 15;
 
 		Object.entries(data).forEach(([key, value]) => {
 			if (value) {
+				// Check if we need a new page for the section header
+				yPos = checkAndAddPage(yPos, 20);
+
+				// Section header
 				doc.setFont("helvetica", "bold");
 				doc.setFontSize(12);
 				doc.setTextColor(0, 0, 0);
-				doc.text(key.charAt(0).toUpperCase() + key.slice(1) + ":", 20, yPos);
+				doc.text(
+					key.charAt(0).toUpperCase() + key.slice(1) + ":",
+					margin,
+					yPos
+				);
 				yPos += 10;
 
+				// Section content
 				doc.setFont("helvetica", "normal");
 				doc.setFontSize(10);
-				doc.setTextColor(0, 0, 0);
-				const text =
-					typeof value === "object"
-						? (value as { Information?: string })?.Information ||
-						  JSON.stringify(value)
-						: String(value);
-				doc.text(text, 20, yPos, { maxWidth: 170 } as TextOptions);
-				yPos += (text.length / 30) * 1.1;
 
-				const urlRegex = /(https?:\/\/[^\s]+)/g;
-				const matches = text.match(urlRegex);
-				if (matches) {
-					matches.forEach((url: string) => {
-						doc.setTextColor(0, 0, 255);
-						doc.textWithLink(url, 20, yPos, { url } as LinkOptions);
-						yPos += 10;
-					});
+				// Clean and format the text
+				let text = "";
+				if (typeof value === "object" && value !== null) {
+					text =
+						(value as { information?: string }).information ||
+						(value as { Information?: string }).Information ||
+						JSON.stringify(value);
+				} else {
+					text = String(value);
 				}
 
-				yPos += 10;
+				// Remove JSON formatting and clean up URLs
+				text = text
+					.replace(/{"information":"|"}/g, "")
+					.replace(/\\n/g, "\n")
+					.replace(/https?:\/\/[^\s]+/g, "");
+
+				// Split text into lines that fit the page width
+				const lines = doc.splitTextToSize(text, contentWidth);
+
+				// Check if we need a new page for the content
+				yPos = checkAndAddPage(yPos, lines.length * 5);
+
+				doc.text(lines, margin, yPos);
+				yPos += lines.length * 5 + 10;
 			}
 		});
 
+		// Add sources at the end
 		if (sources && sources.length > 0) {
+			yPos = checkAndAddPage(yPos, 20 + sources.length * 10);
+
 			doc.setFont("helvetica", "bold");
 			doc.setFontSize(12);
-			doc.text("Sources:", 20, yPos);
+			doc.text("Sources:", margin, yPos);
 			yPos += 10;
 
 			doc.setFont("helvetica", "normal");
 			doc.setTextColor(0, 0, 255);
-			sources.forEach((source, index) => {
-				const linkYPos = yPos + index * 10;
-				doc.textWithLink(source, 20, linkYPos, { url: source } as LinkOptions);
+			sources.forEach((source) => {
+				yPos = checkAndAddPage(yPos, 10);
+				doc.textWithLink(source, margin, yPos, { url: source } as LinkOptions);
+				yPos += 7;
 			});
-			yPos += 20;
 		}
 
 		doc.save(`${query}_report.pdf`);
