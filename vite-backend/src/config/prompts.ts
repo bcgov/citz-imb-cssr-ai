@@ -12,7 +12,7 @@ Format requirements:
 - Maintain technical accuracy while avoiding unnecessary jargon
 - If uncertain about any aspect, state this explicitly
 - Response must be valid JSON without markdown formatting
-- Keep sections between 50-100 words`;
+- Keep sections between 100-200 words`;
 
 export const categoryPrompts = {
 	description:
