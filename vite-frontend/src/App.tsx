@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import SearchPage from "@/components/SearchPage/SearchPage";
 import ResultsPage from "@/components/ResultsPage/ResultsPage";
 
+// Main App component that handles routing and layout structure
 const App: React.FC = () => {
 	return (
 		<Router>
