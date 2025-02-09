@@ -16,7 +16,7 @@ COPY ./index.html .
 
 # Install packages
 RUN npm set progress=false
-RUN npm ci
+RUN npm i
 
 # Build the project
 RUN npm run build
