@@ -15,9 +15,9 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import "@/components/SearchForm/SearchForm.css";
 
-const LOADING_DELAY = 12000;
-
+// Main search form component, memoized to prevent unnecessary re-renders
 export const SearchForm: React.FC = React.memo(() => {
+	// State for form inputs and UI state
 	const [query, setQuery] = useState<string>("");
 	const [categories, setCategories] = useState<Categories>({
 		description: false,
@@ -41,8 +41,12 @@ export const SearchForm: React.FC = React.memo(() => {
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
 
+	// Debounce search query to prevent excessive updates
 	const debouncedQuery = useDebounce(query, 300);
+	// Delay before showing "Almost there..." message during loading
+	const LOADING_DELAY = 12000;
 
+	// Effect to handle loading state messages
 	useEffect(() => {
 		let timeout: NodeJS.Timeout;
 		if (loading) {
@@ -58,6 +62,7 @@ export const SearchForm: React.FC = React.memo(() => {
 		};
 	}, [loading]);
 
+	// Validate form inputs before submission
 	const validateForm = useCallback((): boolean => {
 		if (!debouncedQuery.trim()) {
 			setError("Please enter a SaaS solution name");
@@ -76,12 +81,14 @@ export const SearchForm: React.FC = React.memo(() => {
 		return true;
 	}, [debouncedQuery, categories]);
 
+	// Handle category checkbox changes
 	const handleCategoryChange = useCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const { name, checked } = e.target;
 			setError(null);
 
 			if (name === "selectAll") {
+				// Update all categories when "Select All" is toggled
 				setCategories((prev) =>
 					Object.keys(prev).reduce(
 						(acc, key) => ({
@@ -92,6 +99,7 @@ export const SearchForm: React.FC = React.memo(() => {
 					)
 				);
 			} else {
+				// Update individual category
 				setCategories((prev) => ({
 					...prev,
 					[name]: checked,
@@ -102,6 +110,7 @@ export const SearchForm: React.FC = React.memo(() => {
 		[]
 	);
 
+	// Handle form submission and API call
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
@@ -113,6 +122,7 @@ export const SearchForm: React.FC = React.memo(() => {
 		setError(null);
 
 		try {
+			// Make API request to search endpoint
 			const response = await fetch("/api/search", {
 				method: "POST",
 				headers: {
@@ -127,6 +137,7 @@ export const SearchForm: React.FC = React.memo(() => {
 				);
 			}
 
+			// Process response and navigate to results page
 			const data: SearchResponse = await response.json();
 			if (data?.results?.length) {
 				navigate("/results", {
@@ -150,6 +161,7 @@ export const SearchForm: React.FC = React.memo(() => {
 		}
 	};
 
+	// Memoize category options to prevent unnecessary re-renders
 	const categoryOptions = useMemo(
 		() =>
 			Object.keys(categories).map((category) => (
@@ -168,8 +180,10 @@ export const SearchForm: React.FC = React.memo(() => {
 	);
 
 	return (
+		// Main form container with accessibility attributes
 		<div role="main">
 			<form onSubmit={handleSubmit} className="search-form" noValidate>
+				{/* SaaS solution input field */}
 				<div className="form-group">
 					<label htmlFor="saas-solution">Enter the SaaS Solution Name:</label>
 					<input
@@ -186,6 +200,7 @@ export const SearchForm: React.FC = React.memo(() => {
 						aria-describedby={error ? "error-message" : undefined}
 					/>
 				</div>
+				{/* CSSR sections selection */}
 				<div className="form-group">
 					<fieldset>
 						<legend>Please select one or more CSSR Sections:</legend>
@@ -195,12 +210,14 @@ export const SearchForm: React.FC = React.memo(() => {
 					</fieldset>
 				</div>
 
+				{/* Error message display */}
 				{error && (
 					<div id="error-message" className="error-message" role="alert">
 						{error}
 					</div>
 				)}
 
+				{/* Submit button */}
 				<button
 					type="submit"
 					disabled={loading}
@@ -211,6 +228,7 @@ export const SearchForm: React.FC = React.memo(() => {
 				</button>
 			</form>
 
+			{/* Loading spinner and message */}
 			{loading && (
 				<div className="spinner-container" role="status" aria-live="polite">
 					<span className="loader"></span>
