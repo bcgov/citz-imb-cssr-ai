@@ -5,6 +5,31 @@ import "jspdf-autotable";
 import { LocationState, LinkOptions } from "@/components/ResultsPage/types";
 import "@/components/ResultsPage/ResultsPage.css";
 
+// Helper function to clean text from JSON artifacts
+const cleanText = (text: string): string => {
+	return text
+		.replace(/[{}"]/g, "")
+		.replace(/\\n/g, "\n")
+		.replace(/,(?=[^\s])/g, ", ")
+		.trim();
+};
+
+// Helper function to format object values
+const formatObjectValue = (value: unknown): string => {
+	if (typeof value === "object" && value !== null) {
+		if ("information" in value || "Information" in value) {
+			return String(
+				(value as { information?: string; Information?: string }).information ||
+					(value as { information?: string; Information?: string }).Information
+			);
+		}
+		return Object.entries(value)
+			.map(([k, v]) => `${k}: ${formatObjectValue(v)}`)
+			.join("\n");
+	}
+	return String(value);
+};
+
 export const ResultsPage: React.FC = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -13,7 +38,7 @@ export const ResultsPage: React.FC = () => {
 	const renderValue = (value: unknown): ReactNode => {
 		if (typeof value === "object" && value !== null) {
 			return (
-				<ul>
+				<ul className="result-list">
 					{Object.entries(value).map(([subKey, subValue]) => (
 						<li key={subKey}>
 							<strong>{subKey}:</strong> {renderValue(subValue)}
@@ -23,43 +48,45 @@ export const ResultsPage: React.FC = () => {
 			);
 		}
 
-		if (typeof value !== "string") {
-			return <p>{String(value)}</p>;
-		}
-
+		const formattedValue = cleanText(String(value));
 		const urlRegex = /(https?:\/\/[^\s]+)/g;
-		const matches = value.match(urlRegex);
+		const matches = formattedValue.match(urlRegex);
+
 		if (matches) {
-			return value.split(urlRegex).map((part, index) => {
-				if (matches.includes(part)) {
-					return (
-						<a
-							key={index}
-							href={part}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="source-link"
-						>
-							{part}
-						</a>
-					);
-				}
-				return part;
-			});
+			return (
+				<p>
+					{formattedValue.split(urlRegex).map((part, index) => {
+						if (matches.includes(part)) {
+							return (
+								<a
+									key={index}
+									href={part}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="source-link"
+								>
+									{part}
+								</a>
+							);
+						}
+						return <span key={index}>{part}</span>;
+					})}
+				</p>
+			);
 		}
 
-		return <p>{value}</p>;
+		return <p>{formattedValue}</p>;
 	};
 
 	const renderResults = (): ReactNode => {
-		if (!results || results.length === 0) {
-			return <p>No results found</p>;
+		if (!results?.length) {
+			return <p className="no-results">No results found</p>;
 		}
 
 		const resultItem = results[0];
 
 		return (
-			<div>
+			<div className="results-container">
 				<h2>SaaS Solution: {query}</h2>
 				{Object.entries(resultItem).map(([key, value]) => (
 					<div key={key} className="result-item">
@@ -68,8 +95,8 @@ export const ResultsPage: React.FC = () => {
 					</div>
 				))}
 
-				{sources && sources.length > 0 && (
-					<div>
+				{sources?.length > 0 && (
+					<div className="sources-section">
 						<h3>Sources:</h3>
 						{sources.map((source, index) => (
 							<p key={index} className="source-link">
@@ -91,14 +118,13 @@ export const ResultsPage: React.FC = () => {
 		const margin = 20;
 		const contentWidth = pageWidth - 2 * margin;
 
-		// Helper function to add new page if needed
 		const checkAndAddPage = (
 			currentY: number,
 			requiredSpace: number
 		): number => {
 			if (currentY + requiredSpace > doc.internal.pageSize.height - margin) {
 				doc.addPage();
-				return margin + 10; // Reset Y position on new page
+				return margin + 10;
 			}
 			return currentY;
 		};
@@ -108,13 +134,12 @@ export const ResultsPage: React.FC = () => {
 		doc.setTextColor(0, 102, 204);
 		doc.setFont("helvetica", "bold");
 		let yPos = 20;
-		doc.text("SaaS Solution: " + query, margin, yPos);
-
+		doc.text(`SaaS Solution: ${query}`, margin, yPos);
 		yPos += 15;
 
+		// Content
 		Object.entries(data).forEach(([key, value]) => {
 			if (value) {
-				// Check if we need a new page for the section header
 				yPos = checkAndAddPage(yPos, 20);
 
 				// Section header
@@ -122,7 +147,7 @@ export const ResultsPage: React.FC = () => {
 				doc.setFontSize(12);
 				doc.setTextColor(0, 0, 0);
 				doc.text(
-					key.charAt(0).toUpperCase() + key.slice(1) + ":",
+					`${key.charAt(0).toUpperCase() + key.slice(1)}:`,
 					margin,
 					yPos
 				);
@@ -132,36 +157,17 @@ export const ResultsPage: React.FC = () => {
 				doc.setFont("helvetica", "normal");
 				doc.setFontSize(10);
 
-				// Clean and format the text
-				let text = "";
-				if (typeof value === "object" && value !== null) {
-					text =
-						(value as { information?: string }).information ||
-						(value as { Information?: string }).Information ||
-						JSON.stringify(value);
-				} else {
-					text = String(value);
-				}
+				const formattedText = cleanText(formatObjectValue(value));
+				const lines = doc.splitTextToSize(formattedText, contentWidth);
 
-				// Remove JSON formatting and clean up URLs
-				text = text
-					.replace(/{"information":"|"}/g, "")
-					.replace(/\\n/g, "\n")
-					.replace(/https?:\/\/[^\s]+/g, "");
-
-				// Split text into lines that fit the page width
-				const lines = doc.splitTextToSize(text, contentWidth);
-
-				// Check if we need a new page for the content
 				yPos = checkAndAddPage(yPos, lines.length * 5);
-
 				doc.text(lines, margin, yPos);
 				yPos += lines.length * 5 + 10;
 			}
 		});
 
-		// Add sources at the end
-		if (sources && sources.length > 0) {
+		// Sources
+		if (sources?.length) {
 			yPos = checkAndAddPage(yPos, 20 + sources.length * 10);
 
 			doc.setFont("helvetica", "bold");
@@ -171,6 +177,7 @@ export const ResultsPage: React.FC = () => {
 
 			doc.setFont("helvetica", "normal");
 			doc.setTextColor(0, 0, 255);
+
 			sources.forEach((source) => {
 				yPos = checkAndAddPage(yPos, 10);
 				doc.textWithLink(source, margin, yPos, { url: source } as LinkOptions);
@@ -178,7 +185,7 @@ export const ResultsPage: React.FC = () => {
 			});
 		}
 
-		doc.save(`${query}_report.pdf`);
+		doc.save(`${query.replace(/[^a-zA-Z0-9]/g, "_")}_report.pdf`);
 	};
 
 	return (
@@ -190,7 +197,8 @@ export const ResultsPage: React.FC = () => {
 				</button>
 				<button
 					className="btn btn-primary me-2"
-					onClick={() => results && results[0] && generatePDF(results[0])}
+					onClick={() => results?.[0] && generatePDF(results[0])}
+					disabled={!results?.length}
 				>
 					Download PDF
 				</button>
