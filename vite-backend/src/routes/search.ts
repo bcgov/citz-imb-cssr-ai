@@ -23,7 +23,10 @@ export const createSearchRouter = (openai: OpenAI) => {
 		const { query, categories } = parseResult.data;
 
 		try {
-			const prompt = generatePrompt(query, categories);
+			const [prompt, validation] = await Promise.all([
+				generatePrompt(query, categories),
+				validateCategories(categories),
+			]);
 
 			const completion = await openai.chat.completions.create({
 				model: "gpt-4",
@@ -35,8 +38,10 @@ export const createSearchRouter = (openai: OpenAI) => {
 				throw new Error("No response from OpenAI");
 			}
 
-			const sources = extractSources(response);
-			const parsedResponse = parseResponse(response);
+			const [sources, parsedResponse] = await Promise.all([
+				extractSources(response),
+				parseResponse(response),
+			]);
 
 			if ("error" in parsedResponse) {
 				return res.status(500).json({ error: parsedResponse.error });
@@ -65,38 +70,31 @@ function generatePrompt(
 	query: string,
 	categories: Record<string, boolean>
 ): string {
-	const selectedCategories = Object.keys(categories).filter(
-		(category) => categories[category] && category !== "selectAll"
-	);
+	const selectedCategories = Object.entries(categories)
+		.filter(([category, selected]) => selected && category !== "selectAll")
+		.map(([category]) => category);
 
-	const prompts = selectedCategories.map((category) => {
+	const prompts = selectedCategories.flatMap((category) => {
 		const label =
-			categoryLabels[category as keyof typeof categoryLabels] ||
-			category.charAt(0).toUpperCase() + category.slice(1);
+			categoryLabels[category as keyof typeof categoryLabels] ??
+			`${category[0].toUpperCase()}${category.slice(1)}`;
 		const prompt = categoryPrompts[category as keyof typeof categoryPrompts];
-		return `${label}: ${prompt}`;
+		return prompt ? `${label}: ${prompt}` : [];
 	});
 
 	return `${generalPrompt}
-Give information about ${query} answering the following questions using 2 paragraphs (approx. 50-100 words per paragraph) per question:
+Questions about ${query} (50-100 words per question):
 
 ${prompts.join("\n\n")}
 
-Respond in JSON format with the categories as keys and the corresponding information as values. Ensure to include sources where applicable.`;
+Respond in valid JSON format with category keys and information values. Include sources where applicable.`;
 }
 
 function extractSources(response: string): string[] {
-	const sources: string[] = [];
-	const sourceMatches = response.match(/Source:\s*(https?:\/\/[^\s]+)/g);
-
-	if (sourceMatches) {
-		sourceMatches.forEach((source) => {
-			const url = source.replace("Source: ", "").trim();
-			sources.push(url);
-		});
-	}
-
-	return sources;
+	return Array.from(
+		response.matchAll(/(?<=Source:\s)https?:\/\/[^\s]+/g),
+		(match) => match[0]
+	);
 }
 
 function parseResponse(
@@ -104,20 +102,34 @@ function parseResponse(
 ): Record<string, string> | { error: string } {
 	try {
 		const jsonResponse = JSON.parse(response.trim());
-		const labeledResponse: Record<string, string> = {};
 
-		for (const [key, value] of Object.entries(jsonResponse)) {
-			const label = categoryLabels[key as keyof typeof categoryLabels] || key;
-			labeledResponse[label] = value as string;
+		if (typeof jsonResponse !== "object" || jsonResponse === null) {
+			throw new Error("Invalid JSON structure");
 		}
 
-		return labeledResponse;
+		return Object.fromEntries(
+			Object.entries(jsonResponse).map(([key, value]) => [
+				categoryLabels[key as keyof typeof categoryLabels] ?? key,
+				value as string,
+			])
+		);
 	} catch (error) {
 		console.error("Error parsing JSON response:", error);
 		return {
-			error: `Unable to parse JSON response: ${
+			error: `JSON parsing failed: ${
 				error instanceof Error ? error.message : "Unknown error"
 			}`,
 		};
+	}
+}
+
+async function validateCategories(categories: Record<string, boolean>) {
+	const validCategories = Object.keys(categoryLabels);
+	const invalid = Object.keys(categories).filter(
+		(c) => !validCategories.includes(c)
+	);
+
+	if (invalid.length > 0) {
+		throw new Error(`Invalid categories: ${invalid.join(", ")}`);
 	}
 }
