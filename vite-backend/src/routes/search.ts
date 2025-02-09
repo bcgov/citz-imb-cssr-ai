@@ -87,7 +87,15 @@ Questions about ${query} (50-100 words per question):
 
 ${prompts.join("\n\n")}
 
-Respond in valid JSON format with category keys and information values. Include sources where applicable.`;
+IMPORTANT: Your response MUST be a single valid JSON object with category keys and information values. 
+Do not include any markdown formatting, prefixes, or suffixes. 
+The response should start with '{' and end with '}'. 
+Each value must be a string.
+Example format:
+{
+  "category1": "information about category1",
+  "category2": "information about category2"
+}`;
 }
 
 function extractSources(response: string): string[] {
@@ -101,24 +109,54 @@ function parseResponse(
 	response: string
 ): Record<string, string> | { error: string } {
 	try {
-		const jsonResponse = JSON.parse(response.trim());
+		// First, try to clean the response if it contains any markdown-like formatting
+		let cleanedResponse = response.trim();
 
-		if (typeof jsonResponse !== "object" || jsonResponse === null) {
-			throw new Error("Invalid JSON structure");
+		// Remove any markdown code block indicators
+		cleanedResponse = cleanedResponse.replace(/```json\s*|\s*```/g, "");
+
+		// If response starts with a newline, remove it
+		cleanedResponse = cleanedResponse.replace(/^\n+/, "");
+
+		// Attempt to parse the cleaned response
+		let jsonResponse: unknown;
+		try {
+			jsonResponse = JSON.parse(cleanedResponse);
+		} catch (parseError) {
+			// If parsing fails, try to extract JSON-like content
+			const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+			if (jsonMatch) {
+				try {
+					jsonResponse = JSON.parse(jsonMatch[0]);
+				} catch {
+					throw new Error("Could not parse JSON content");
+				}
+			} else {
+				throw new Error("No valid JSON structure found in response");
+			}
 		}
 
-		return Object.fromEntries(
-			Object.entries(jsonResponse).map(([key, value]) => [
-				categoryLabels[key as keyof typeof categoryLabels] ?? key,
-				value as string,
-			])
-		);
+		// Validate the parsed response
+		if (typeof jsonResponse !== "object" || jsonResponse === null) {
+			throw new Error("Invalid JSON structure: not an object");
+		}
+
+		// Convert and validate each entry
+		const entries = Object.entries(jsonResponse).map(([key, value]) => {
+			if (typeof value !== "string") {
+				throw new Error(`Invalid value type for key "${key}": expected string`);
+			}
+			return [categoryLabels[key as keyof typeof categoryLabels] ?? key, value];
+		});
+
+		return Object.fromEntries(entries);
 	} catch (error) {
 		console.error("Error parsing JSON response:", error);
+		console.error("Raw response:", response);
 		return {
 			error: `JSON parsing failed: ${
 				error instanceof Error ? error.message : "Unknown error"
-			}`,
+			}. Please try again.`,
 		};
 	}
 }
