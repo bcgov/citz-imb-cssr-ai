@@ -2,10 +2,10 @@ services:
   ############################# Express API ###################################
   cssr-api:
     env_file:
-      - ../server/.env
+      - ../vite-backend/.env
     restart: "no"
     build:
-      context: ../server
+      context: ../vite-backend
       target: Prod
     ports:
       - ${API_HTTP_PORT:-8000}:8000
@@ -23,7 +23,7 @@ services:
     tty: true
     restart: "no"
     build:
-      context: ../client
+      context: ../vite-frontend
       target: prod
     ports:
       - ${APP_HTTP_PORT:-3000}:3000

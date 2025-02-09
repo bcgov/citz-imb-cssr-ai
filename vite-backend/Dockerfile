@@ -41,4 +41,4 @@ RUN apt-get install -y curl
 COPY --from=base /server/dist .
 
 # Start the server
-CMD ["node", "index.js"]
+CMD ["node", "src/index.js"]

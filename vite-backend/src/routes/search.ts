@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request, type Response } from "express";
 import { OpenAI } from "openai";
 import {
 	categoryLabels,
@@ -10,7 +10,7 @@ import { generalPrompt, categoryPrompts } from "../config/prompts.js";
 export const createSearchRouter = (openai: OpenAI) => {
 	const router = Router();
 
-	router.post("/", async (req, res) => {
+	router.post("/", async (req: Request, res: Response) => {
 		const parseResult = searchRequestSchema.safeParse(req.body);
 
 		if (!parseResult.success) {

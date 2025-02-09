@@ -6,7 +6,7 @@ import { createSearchRouter } from "./routes/search.js";
 // Load environment variables
 config();
 
-const { API_HTTP_PORT = "8000", OPENAI_API_KEY } = process.env;
+const { API_HTTP_PORT, OPENAI_API_KEY } = process.env;
 
 if (!OPENAI_API_KEY) {
 	console.error("OPENAI_API_KEY environment variable is required");
@@ -14,7 +14,7 @@ if (!OPENAI_API_KEY) {
 }
 
 const app = express();
-const PORT = parseInt(API_HTTP_PORT, 10);
+const PORT = parseInt(API_HTTP_PORT ?? "8000", 10);
 
 // Initialize OpenAI client
 const openai = new OpenAI({
