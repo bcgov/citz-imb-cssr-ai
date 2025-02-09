@@ -1,8 +1,7 @@
-@import "./styles/shared.css";
+@import "@bcgov/bc-sans/css/BCSans";
 
 :root {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	font-family: "BCSans", sans-serif;
 	line-height: 1.5;
 	font-weight: 400;
 	color: #213547;
