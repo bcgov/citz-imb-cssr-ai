@@ -7,16 +7,18 @@ FROM node:18.17.1-bullseye-slim AS base
 # Set the working directory to /app
 WORKDIR /app
 
-# Copy files
+# Copy all files needed for build
+COPY package*.json ./
+COPY vite.config.js ./
+COPY index.html ./
 COPY ./src ./src
 COPY ./public ./public
-COPY package.json .
 
-# Npm install packages. Omits dev dependencies when NODE_ENV=production
+# Install packages
 RUN npm set progress=false
-RUN npm i
+RUN npm ci
 
-# Build the project.
+# Build the project
 RUN npm run build
 
 #############################################
@@ -35,7 +37,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy static assets from builder stage
-COPY --from=base /app/build .
+COPY --from=base /app/dist .
 
 # Provide nginx directory the required permissions
 RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx
