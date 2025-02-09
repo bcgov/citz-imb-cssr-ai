@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
 	Categories,
@@ -25,8 +25,26 @@ export const SearchForm: React.FC = () => {
 		selectAll: false,
 	});
 	const [loading, setLoading] = useState<boolean>(false);
+	const [loadingMessage, setLoadingMessage] = useState<string>(
+		"Waiting for review..."
+	);
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		let timeout: NodeJS.Timeout;
+		if (loading) {
+			setLoadingMessage("Waiting for review...");
+			timeout = setTimeout(() => {
+				setLoadingMessage("Almost there...");
+			}, 12000);
+		}
+		return () => {
+			if (timeout) {
+				clearTimeout(timeout);
+			}
+		};
+	}, [loading]);
 
 	const handleCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, checked } = e.target;
@@ -144,6 +162,9 @@ export const SearchForm: React.FC = () => {
 			{loading && (
 				<div className="spinner-container">
 					<span className="loader"></span>
+					<p style={{ marginTop: "10px", textAlign: "center" }}>
+						{loadingMessage}
+					</p>
 				</div>
 			)}
 		</div>
