@@ -2,28 +2,30 @@
 #                Base Build                 #
 #############################################
 
-FROM node:18.17.1-bullseye-slim as base
+FROM node:22.13.1-bullseye-slim AS base
 
 # Set the working directory to /app
 WORKDIR /app
 
-# Copy files
+# Copy all files needed for build
 COPY ./src ./src
-COPY ./public ./public
 COPY package.json .
+COPY tsconfig.json .
+COPY vite.config.ts .
+COPY ./index.html .
 
-# Npm install packages. Omits dev dependencies when NODE_ENV=production
+# Install packages
 RUN npm set progress=false
 RUN npm i
 
-# Build the project.
+# Build the project
 RUN npm run build
 
 #############################################
 #                NGINX Build                #
 #############################################
 ## Stage 2: Nginx state for serving content
-FROM nginx:alpine-slim as prod
+FROM nginx:alpine-slim AS prod
 
 # copy custom nginx configuration from host to container
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -35,7 +37,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy static assets from builder stage
-COPY --from=base /app/build .
+COPY --from=base /app/dist .
 
 # Provide nginx directory the required permissions
 RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx

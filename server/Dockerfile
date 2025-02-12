@@ -2,32 +2,36 @@
 #                 Base                      #
 #############################################
 # Use an official Node.js runtime as a base image
-FROM node:22.9-bullseye-slim as base
+FROM node:22.13.1-bullseye-slim AS base
 
 # Set the working directory in the container
 WORKDIR /server
 
-# Copy files, excluding those in .dockerignore
+# Copy package files
+COPY package*.json ./
+
+# Copy source code
 COPY . .
 
-# Install packages. Needed for build process.
-RUN npm i
+# Install dependencies
+RUN npm install
 
-# Compile to JavaScript build 
+# Build TypeScript code
 RUN npm run build
 
 #############################################
 #                 Prod Build                #
 #############################################
-FROM node:22.9-bullseye-slim as Prod
+FROM node:22.13.1-bullseye-slim AS prod
 
 # Set the working directory to /server
 WORKDIR /server
 
-# Install packages. Needed even for compiled build.
-# Only installs non-dev dependencies
-COPY package.json .
-RUN npm i
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm install
 
 # Add curl for health check
 RUN apt-get update
@@ -36,5 +40,5 @@ RUN apt-get install -y curl
 # Copy compiled build from base
 COPY --from=base /server/dist .
 
-
-CMD ["node", "index.js"]
+# Start the server
+CMD ["node", "src/index.js"]

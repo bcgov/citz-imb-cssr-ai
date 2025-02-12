@@ -1,0 +1,33 @@
+/* Styling for the navigation bar */
+.navbar {
+	background-color: #1d70c3;
+	padding: 10px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+/* Layout for the left side of the navigation bar */
+.navbar-left {
+	display: flex;
+	align-items: center;
+}
+
+/* Styling for the brand name in the navbar */
+.navbar-brand {
+	color: white;
+	text-decoration: none;
+	font-size: 1.5em;
+}
+
+/* Layout for the right side of the navigation bar */
+.navbar-right {
+	display: flex;
+	align-items: center;
+}
+
+/* Styling for the team name in the navbar */
+.navbar-team {
+	color: white;
+	font-style: italic;
+}
