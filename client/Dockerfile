@@ -2,21 +2,21 @@
 #                Base Build                 #
 #############################################
 
-FROM node:18.17.1-bullseye-slim AS base
+FROM node:22.13.1-bullseye-slim AS base
 
 # Set the working directory to /app
 WORKDIR /app
 
 # Copy all files needed for build
-COPY package*.json ./
-COPY vite.config.js ./
-COPY index.html ./
 COPY ./src ./src
-COPY ./public ./public
+COPY package.json .
+COPY tsconfig.json .
+COPY vite.config.ts .
+COPY ./index.html .
 
 # Install packages
 RUN npm set progress=false
-RUN npm ci
+RUN npm i
 
 # Build the project
 RUN npm run build
