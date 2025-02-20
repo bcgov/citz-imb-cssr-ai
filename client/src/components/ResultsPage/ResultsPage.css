@@ -1,0 +1,131 @@
+@import "@/styles/shared.css";
+
+/* Component-specific styles */
+.results-page {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.result-item {
+	margin: 15px 0;
+	padding: 15px;
+	background-color: #f9f9f9;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+}
+
+.result-item strong {
+	display: block;
+	margin-bottom: 8px;
+	color: #333;
+}
+
+.result-item ul {
+	margin: 0;
+	padding-left: 20px;
+}
+
+.result-item li {
+	margin: 5px 0;
+}
+
+.source-link {
+	word-break: break-all;
+}
+
+/* Utility classes */
+.d-flex {
+	display: flex;
+}
+
+.justify-content-center {
+	justify-content: center;
+}
+
+.mb-3 {
+	margin-bottom: 1rem;
+}
+
+.me-2 {
+	margin-right: 0.5rem;
+}
+
+/* Results specific layouts */
+.results-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.results-header h1 {
+	align-items: center;
+	margin: 0;
+}
+
+.results-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.result-item p {
+	margin: 0;
+	padding-left: 15px;
+}
+
+.results-container {
+	background-color: #f8f9fa;
+	padding: 20px;
+}
+
+.result-section {
+	margin-bottom: 20px;
+}
+
+.result-section h2 {
+	color: #007bff;
+	margin-bottom: 10px;
+}
+
+.result-section p {
+	margin: 0;
+	line-height: 1.5;
+}
+
+.result-screen {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 20px;
+}
+
+.result-content {
+	background-color: white;
+	padding: 20px;
+}
+
+.sources-container {
+	margin-top: 20px;
+	padding: 10px;
+}
+
+/* List styling */
+ul {
+	list-style-type: none;
+	padding-left: 0;
+}
+
+/* Link styling */
+a {
+	color: #007bff;
+	text-decoration: none;
+}
+
+/* Hover effect for links */
+a:hover {
+	text-decoration: underline;
+}
