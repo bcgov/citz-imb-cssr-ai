@@ -35,10 +35,10 @@ export const createSearchRouter = (openai: OpenAI) => {
 			// Generate and execute OpenAI query
 			const prompt = generatePrompt(query, categories);
 			const completion = await openai.chat.completions.create({
-				model: "gpt-4",
+				model: "gpt-4o-mini",
 				messages: [{ role: "user", content: prompt }],
 				temperature: 0.3, // Lower temperature for more focused responses
-				max_tokens: 2000, // Limit response length for consistency
+				max_tokens: 7000, // Limit response length for consistency
 			});
 
 			// Process OpenAI response
