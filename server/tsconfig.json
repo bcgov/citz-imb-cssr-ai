@@ -12,8 +12,8 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"outDir": "./dist",
-		"rootDir": "./"
+		"rootDir": "./src"
 	},
-	"include": ["src/**/*"],
+	"include": ["src"],
 	"exclude": ["node_modules", "dist"]
 }
