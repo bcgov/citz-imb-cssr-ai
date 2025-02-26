@@ -40,5 +40,6 @@ RUN apt-get install -y curl
 # Copy compiled build from base
 COPY --from=base /server/dist .
 
+# adding temp comment
 # Start the server
 CMD ["node", "index.js"]
